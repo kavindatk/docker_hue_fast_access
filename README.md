@@ -110,12 +110,26 @@ sudo docker run hello-world
 The following steps will guide you through the Presto installation process on an Ubuntu environment.
 
 
-### 1.1 Download Presto
+### 1.1 Download Presto and set Environment Variables
 
 ```bash
 wget https://repo1.maven.org/maven2/com/facebook/presto/presto-server/0.293/presto-server-0.293.tar.gz
 tar -xvzf presto-server-0.293.tar.gz
 mv presto-server-0.293 presto
+```
+
+```bash
+nano ~/.bashrc
+```
+
+```bash
+# Presto Related Option
+export PRESTO_HOME=/opt/presto
+export PATH=$PATH:$PRESTO_HOME/bin
+```
+
+```bash
+source ~/.bashrc
 ```
 
 ### 1.2 Configure Presto 
