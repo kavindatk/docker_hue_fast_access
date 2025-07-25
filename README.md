@@ -118,6 +118,7 @@ The following steps will guide you through the Presto installation process on an
 wget https://repo1.maven.org/maven2/com/facebook/presto/presto-server/0.293/presto-server-0.293.tar.gz
 tar -xvzf presto-server-0.293.tar.gz
 mv presto-server-0.293 presto
+wget https://repo1.maven.org/maven2/com/facebook/presto/presto-cli/0.293/presto-cli-0.293-executable.jar -O /opt/presto/bin/presto # This need to put in bin dir
 ```
 
 ```bash
