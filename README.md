@@ -80,6 +80,9 @@ sudo systemctl start docker
 sudo systemctl enable docker
 sudo systemctl status docker
 
+# Add current user to docker group
+sudo usermod -aG docker $USER
+
 # Check Docker version
 docker --version
 
