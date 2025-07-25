@@ -1,5 +1,26 @@
 # GUI-Based Querying and Fast Data Retrieval
 
+<br/><br/>
+<p align="center">
+<picture>
+  <img alt="docker" src="https://github.com/kavindatk/docker_hue_fast_access/blob/main/images/docker.jpg" width="" height="125">
+</picture>
+  
+<picture>
+  <img alt="docker" src="https://github.com/kavindatk/docker_hue_fast_access/blob/main/images/hue_logo.png" width="200" height="125">
+</picture>
+
+<picture>
+  <img alt="docker" src="https://github.com/kavindatk/docker_hue_fast_access/blob/main/images/impala_logo.png" width="200" height="125">
+</picture>
+
+<picture>
+  <img alt="docker" src="https://github.com/kavindatk/docker_hue_fast_access/blob/main/images/presto_logo.JPG" width="200" height="125">
+</picture>
+</p>
+
+<br/><br/>
+
 So far, we have successfully set up a <b>3-NameNode Hadoop cluster with Hive and Tez</b>.
 
 Now, we’ll enhance the setup by adding:
@@ -10,6 +31,13 @@ Now, we’ll enhance the setup by adding:
 Before we proceed with these tools, I will first <b>install Docker</b> on all three NameNodes. This will help us easily deploy and manage GUI tools and other services.
 The steps below show how to <b>install Docker on the 3 NameNode</b> setup.
 <br/><br/>
+
+
+# Docker
+
+<picture>
+  <img alt="docker" src="https://github.com/kavindatk/docker_hue_fast_access/blob/main/images/docker.jpg" width="" height="125">
+</picture>
 
 ## Step 1: Install Docker on Ubuntu
 
@@ -41,6 +69,7 @@ echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docke
 sudo apt update
 sudo apt install docker-ce docker-ce-cli containerd.io
 sudo apt install docker-compose-plugin
+sudo apt install docker-compose 
 ```
 
 ### Verify Installation
@@ -63,16 +92,37 @@ docker-compose --version
 sudo docker run hello-world
 ```
 
+<picture>
+  <img alt="docker" src="https://github.com/kavindatk/docker_hue_fast_access/blob/main/images/docker_log.JPG" width="800" height="400">
+</picture>
 
 
 
+# Apache IMPALA
+
+<picture>
+  <img alt="docker" src="https://github.com/kavindatk/docker_hue_fast_access/blob/main/images/impala_logo.png" width="200" height="125">
+</picture>
 
 
 
+## Step 1: Install IMAPA on Ubuntu
+
+The following steps will guide you through the Apcahe IMPALA installation process on an Ubuntu environment.
 
 
+### 1.1 Clone IMPALA Repos
 
+```bash
+git clone https://github.com/apache/impala.git
+cd impala/docker
+```
 
+### 1.2 Add Docker's official GPG key:
+
+```bash
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+```
 
 
 
