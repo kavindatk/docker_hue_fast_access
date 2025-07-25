@@ -1,2 +1,82 @@
-# docker_hue_fast_access
-Install Docker , Hue , IMPALA or PRESTO in 3NN setup
+# GUI-Based Querying and Fast Data Retrieval
+
+So far, we have successfully set up a <b>3-NameNode Hadoop cluster with Hive and Tez</b>.
+
+Now, we’ll enhance the setup by adding:
+
+* GUI-based tools for easier querying
+* Fast SQL engines like Impala or Presto for faster data access and analytics
+
+Before we proceed with these tools, I will first <b>install Docker</b> on all three NameNodes. This will help us easily deploy and manage GUI tools and other services.
+The steps below show how to <b>install Docker on the 3 NameNode</b> setup.
+<br/><br/>
+
+## Step 1: Install Docker on Ubuntu
+
+The following steps will guide you through the Docker installation process on an Ubuntu environment.
+
+
+### 1.1 Update package index and install prerequisites:
+
+```bash
+sudo apt update
+sudo apt install apt-transport-https ca-certificates curl gnupg lsb-release
+```
+
+### 1.2 Add Docker's official GPG key:
+
+```bash
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+```
+
+### 1.3 Add Docker repository:
+
+```bash
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+```
+
+### 1.4 Install Docker Engine:
+
+```bash
+sudo apt update
+sudo apt install docker-ce docker-ce-cli containerd.io
+sudo apt install docker-compose-plugin
+```
+
+### Verify Installation
+
+```bash
+# Start and Enable service
+sudo systemctl start docker
+sudo systemctl enable docker
+sudo systemctl status docker
+
+# Check Docker version
+docker --version
+
+# Check Docker Compose version
+docker compose version
+# or if using standalone version:
+docker-compose --version
+
+# Test Docker installation
+sudo docker run hello-world
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
