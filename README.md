@@ -65,7 +65,9 @@ echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docke
 sudo apt update
 sudo apt install docker-ce docker-ce-cli containerd.io
 sudo apt install docker-compose-plugin
-sudo apt install docker-compose 
+sudo apt install docker-compose
+
+sudo apt install python-is-python3 # For Presto
 ```
 
 ### Verify Installation
@@ -156,6 +158,7 @@ node.data-dir=/opt/presto/data
 -server
 -Xmx16G
 -XX:+UseG1GC
+-Djdk.attach.allowAttachSelf=true
 ```
 
 * config.properties
@@ -187,6 +190,7 @@ discovery.uri=http://bigdataproxy:8080 # This is HAPROXY for HA mode
 ```bash
 mkdir catalog
 cd catalog
+nano hive.properties
 ```
 
 ```xml
@@ -195,3 +199,11 @@ hive.metastore.uri=thrift://bigdataproxy:9083 # This is HAPROXY for HA mode
 hive.config.resources=/etc/hadoop/conf/core-site.xml,/etc/hadoop/conf/hdfs-site.xml
 ```
 
+
+### 1.3 Start Presto Service
+
+On Each Node , run following command 
+
+```bash
+launcher start
+```
