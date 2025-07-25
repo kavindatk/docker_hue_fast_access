@@ -11,10 +11,6 @@
 </picture>
 
 <picture>
-  <img alt="docker" src="https://github.com/kavindatk/docker_hue_fast_access/blob/main/images/impala_logo.png" width="200" height="125">
-</picture>
-
-<picture>
   <img alt="docker" src="https://github.com/kavindatk/docker_hue_fast_access/blob/main/images/presto_logo.JPG" width="200" height="125">
 </picture>
 </p>
@@ -101,35 +97,87 @@ sudo docker run hello-world
 
 
 
-# Apache IMPALA
+# Presto 
 
 <picture>
-  <img alt="docker" src="https://github.com/kavindatk/docker_hue_fast_access/blob/main/images/impala_logo.png" width="200" height="125">
+  <img alt="docker" src="https://github.com/kavindatk/docker_hue_fast_access/blob/main/images/presto_logo.JPG" width="200" height="125">
 </picture>
 
 
 
-## Step 1: Install IMAPA on Ubuntu
+## Step 1: Install Presto on Ubuntu
 
-The following steps will guide you through the Apcahe IMPALA installation process on an Ubuntu environment.
+The following steps will guide you through the Presto installation process on an Ubuntu environment.
 
 
-### 1.1 Clone IMPALA Repos
-
-```bash
-git clone https://github.com/apache/impala.git
-cd impala/docker
-```
-
-### 1.2 Add Docker's official GPG key:
+### 1.1 Download Presto
 
 ```bash
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+wget https://repo1.maven.org/maven2/com/facebook/presto/presto-server/0.293/presto-server-0.293.tar.gz
+tar -xvzf presto-server-0.293.tar.gz
+mv presto-server-0.293 presto
 ```
 
+### 1.2 Configure Presto 
 
+```bash
+cd presto
+mkdir etc data
+cd etc
+```
 
+#### Add or modify following files
 
+* node.properties
 
+```xml
+node.environment=production
+node.id=presto-node-1 # This should be unique for each server
+node.data-dir=/opt/presto/data
+```
 
+* jvm.config
+
+```xml
+-server
+-Xmx16G
+-XX:+UseG1GC
+```
+
+* config.properties
+
+** IF Coordinator: 
+
+```xml
+coordinator=true
+node-scheduler.include-coordinator=false
+http-server.http.port=8080
+query.max-memory=5GB
+query.max-memory-per-node=1GB
+discovery-server.enabled=true
+discovery.uri=http://bigdataproxy:8080 # This is HAPROXY for HA mode
+```
+
+** IF Worker: 
+
+```xml
+coordinator=false
+http-server.http.port=8080
+query.max-memory=5GB
+query.max-memory-per-node=1GB
+discovery.uri=http://bigdataproxy:8080 # This is HAPROXY for HA mode
+```
+
+* catalog/hive.properties
+
+```bash
+mkdir catalog
+cd catalog
+```
+
+```xml
+connector.name=hive-hadoop2
+hive.metastore.uri=thrift://bigdataproxy:9083 # This is HAPROXY for HA mode
+hive.config.resources=/etc/hadoop/conf/core-site.xml,/etc/hadoop/conf/hdfs-site.xml
+```
 
