@@ -102,7 +102,7 @@ sudo docker run hello-world
 # Presto 
 
 <picture>
-  <img alt="docker" src="https://github.com/kavindatk/docker_hue_fast_access/blob/main/images/presto_logo.JPG" width="200" height="125">
+  <img alt="docker" src="https://github.com/kavindatk/docker_hue_fast_access/blob/main/images/presto_logo.JPG" width="200" height="100">
 </picture>
 
 
@@ -159,6 +159,11 @@ node.data-dir=/opt/presto/data
 -server
 -Xmx16G
 -XX:+UseG1GC
+-XX:G1HeapRegionSize=32M
+-XX:+UseGCOverheadLimit
+-XX:+ExplicitGCInvokesConcurrent
+-XX:+HeapDumpOnOutOfMemoryError
+-XX:+ExitOnOutOfMemoryError
 -Djdk.attach.allowAttachSelf=true
 ```
 
@@ -169,21 +174,21 @@ node.data-dir=/opt/presto/data
 ```xml
 coordinator=true
 node-scheduler.include-coordinator=false
-http-server.http.port=8080
+http-server.http.port=8090
 query.max-memory=5GB
 query.max-memory-per-node=1GB
 discovery-server.enabled=true
-discovery.uri=http://bigdataproxy:8080 # This is HAPROXY for HA mode
+discovery.uri=http://bigdataproxy:9090 # This is HAPROXY for HA mode
 ```
 
 ** IF Worker: 
 
 ```xml
 coordinator=false
-http-server.http.port=8080
+http-server.http.port=8090
 query.max-memory=5GB
 query.max-memory-per-node=1GB
-discovery.uri=http://bigdataproxy:8080 # This is HAPROXY for HA mode
+discovery.uri=http://bigdataproxy:9090 # This is HAPROXY for HA mode
 ```
 
 * catalog/hive.properties
@@ -196,9 +201,31 @@ nano hive.properties
 
 ```xml
 connector.name=hive-hadoop2
-hive.metastore.uri=thrift://bigdataproxy:9083 # This is HAPROXY for HA mode
-hive.config.resources=/etc/hadoop/conf/core-site.xml,/etc/hadoop/conf/hdfs-site.xml
+hive.metastore.uri=thrift://bigdataproxy:9083
+
+hive.config.resources=/opt/presto/etc/hadoop/hdfs-site.xml,/opt/presto/etc/hadoop/core-site.xml
+
+# Force managed tables by default
+hive.non-managed-table-writes-enabled=true
+hive.non-managed-table-creates-enabled=true
 ```
+
+* hadoop/<hadoop config for presto>
+
+```bash
+mkdir hadoop
+cd haoop
+<copy hadoop core-site.xml , hdfs-site.xml and yarn-sie.xml and modified for presto , this need if you have HA setup> 
+```
+
+Modfied only core-site.xml to HA proxy via HDFS access
+
+```xml
+      <property>
+              <name>fs.defaultFS</name>
+              <value>hdfs://bigdatacluster:8020</value>
+      </property>
+``
 
 
 ### 1.3 Start Presto Service
@@ -208,3 +235,66 @@ On Each Node , run following command
 ```bash
 launcher start
 ```
+
+
+You can stop and check status via 
+
+```bash
+launcher stop/status
+```
+
+###  Verify Installation
+
+Log into Presto via cli ot browser 
+
+
+browser : http://172.27.41.131:8090/ui/
+
+cli :
+
+```bash
+presto --server bigdataproxy:9090 --catalog hive --schema default
+```
+
+```sql
+SELECT * FROM system.runtime.nodes; # Check running node list
+
+SHOW TABLES FROM hive.<schema name>;
+
+DESCRIBE hive.<schema>.<table>;
+or
+SHOW COLUMNS FROM  hive.<schema>.<table>;
+
+
+CREATE SCHEMA <schema>;
+
+SHOW CATALOGS;
+or
+SHOW SCHEMAS FROM hive;
+
+CREATE TABLE hive.<schema>.<table> (
+    id INT,
+    name VARCHAR,
+    city VARCHAR
+);
+
+INSERT INTO hive.<schema>.<table> (id, name, city)
+VALUES (1, 'Alice', 'New York'), (2, 'Bob', 'London');	
+
+CREATE TABLE hive.<schema>.<table> (
+    product_id INT,
+    product_name VARCHAR,
+    price DOUBLE
+)
+WITH (
+    format = 'ORC', -- Or 'PARQUET', 'CSV', etc.
+    external_location = '<hdfs path>' 
+);
+
+INSERT INTO hive.<schema>.<table> (product_id, product_name, price)
+VALUES (101, 'Laptop', 1200.00), (102, 'Mouse', 25.50);
+```
+
+<picture>
+  <img alt="docker" src="https://github.com/kavindatk/docker_hue_fast_access/blob/main/images/presto_check.JPG" width="600" height="200">
+</picture>
