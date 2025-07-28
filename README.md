@@ -3,12 +3,9 @@
 <br/><br/>
 <p align="center">
 <picture>
-  <img alt="docker" src="https://github.com/kavindatk/docker_hue_fast_access/blob/main/images/docker.jpg" width="" height="125">
-</picture>
-  
-<picture>
   <img alt="docker" src="https://github.com/kavindatk/docker_hue_fast_access/blob/main/images/hue_logo.png" width="200" height="125">
 </picture>
+
 
 <picture>
   <img alt="docker" src="https://github.com/kavindatk/docker_hue_fast_access/blob/main/images/presto_logo.JPG" width="200" height="125">
@@ -19,84 +16,15 @@
 
 So far, we have successfully set up a <b>3-NameNode Hadoop cluster with Hive and Tez</b>.
 
-Now, we’ll enhance the setup by adding:
+Now we’re moving forward with the <b>installation of Presto and Hue</b> on our <b>3-NameNode Hadoop cluster</b>.
 
-* GUI-based tools for easier querying
-* Fast SQL engines like Impala or Presto for faster data access and analytics
+Since <b>Impala is a Cloudera proprietary product</b>, we’ve chosen to use <b>Presto</b> as our fast SQL query engine.
 
-Before we proceed with these tools, I will first <b>install Docker</b> on all three NameNodes. This will help us easily deploy and manage GUI tools and other services.
-The steps below show how to <b>install Docker on the 3 NameNode</b> setup.
+In the next steps, I’ll show you how to <b>install Presto</b>.
+
+Going forward, I also plan to <b>integrate Hue with Presto, Hive, Spark, and other open-source tools</b>.
+The <b>Hue configuration</b> shared below will include settings for connecting to these components — some of which are covered in previous articles.
 <br/><br/>
-
-
-# Docker
-
-<picture>
-  <img alt="docker" src="https://github.com/kavindatk/docker_hue_fast_access/blob/main/images/docker.jpg" width="" height="125">
-</picture>
-
-## Step 1: Install Docker on Ubuntu
-
-The following steps will guide you through the Docker installation process on an Ubuntu environment.
-
-
-### 1.1 Update package index and install prerequisites:
-
-```bash
-sudo apt update
-sudo apt install apt-transport-https ca-certificates curl gnupg lsb-release
-```
-
-### 1.2 Add Docker's official GPG key:
-
-```bash
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
-```
-
-### 1.3 Add Docker repository:
-
-```bash
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-```
-
-### 1.4 Install Docker Engine:
-
-```bash
-sudo apt update
-sudo apt install docker-ce docker-ce-cli containerd.io
-sudo apt install docker-compose-plugin
-sudo apt install docker-compose
-
-sudo apt install python-is-python3 # For Presto
-```
-
-### Verify Installation
-
-```bash
-# Start and Enable service
-sudo systemctl start docker
-sudo systemctl enable docker
-sudo systemctl status docker
-
-# Add current user to docker group
-sudo usermod -aG docker $USER
-
-# Check Docker version
-docker --version
-
-# Check Docker Compose version
-docker compose version
-# or if using standalone version:
-docker-compose --version
-
-# Test Docker installation
-sudo docker run hello-world
-```
-
-<picture>
-  <img alt="docker" src="https://github.com/kavindatk/docker_hue_fast_access/blob/main/images/docker_log.JPG" width="800" height="400">
-</picture>
-
 
 
 # Presto 
@@ -225,7 +153,7 @@ Modfied only core-site.xml to HA proxy via HDFS access
               <name>fs.defaultFS</name>
               <value>hdfs://bigdatacluster:8020</value>
       </property>
-``
+```
 
 
 ### 1.3 Start Presto Service
@@ -248,9 +176,9 @@ launcher stop/status
 Log into Presto via cli ot browser 
 
 
-browser : http://172.27.41.131:8090/ui/
+Browser : http://172.27.41.131:8090/ui/
 
-cli :
+CLI :
 
 ```bash
 presto --server bigdataproxy:9090 --catalog hive --schema default
