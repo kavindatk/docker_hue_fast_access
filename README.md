@@ -6,11 +6,16 @@
   <img alt="docker" src="https://github.com/kavindatk/docker_hue_fast_access/blob/main/images/hue_logo.png" width="200" height="125">
 </picture>
 
+<picture>
+  <img alt="docker" src="https://github.com/kavindatk/presto_spark_hue/blob/main/images/spark_logo.png" width="200" height="125">
+</picture>
 
 <picture>
   <img alt="docker" src="https://github.com/kavindatk/docker_hue_fast_access/blob/main/images/presto_logo.JPG" width="200" height="125">
 </picture>
 </p>
+
+
 
 <br/><br/>
 
@@ -226,3 +231,97 @@ VALUES (101, 'Laptop', 1200.00), (102, 'Mouse', 25.50);
 <picture>
   <img alt="docker" src="https://github.com/kavindatk/docker_hue_fast_access/blob/main/images/presto_check.JPG" width="600" height="200">
 </picture>
+
+<br/><br/>
+
+# Spark 
+
+<picture>
+  <img alt="docker" src="https://github.com/kavindatk/docker_hue_fast_access/blob/main/images/spark_logo.png" width="200" height="100">
+</picture>
+
+
+## Step 1: Install Spark on Ubuntu
+
+The following steps will guide you through the Spark installation process on an Ubuntu environment.
+
+
+### 1.1 Download Presto and set Environment Variables
+
+```bash
+wget https://downloads.apache.org/spark/spark-3.5.6/spark-3.5.6-bin-without-hadoop.tgz
+tar -xvzf spark-3.5.6-bin-without-hadoop.tgz
+mv spark-3.5.6-bin-without-hadoop spark
+mv spark /opt/
+```
+
+```bash
+nano ~/.bashrc
+```
+
+```bash
+# Spark Related Option
+export SPARK_HOME=/opt/spark
+export PATH=$PATH:$SPARK_HOME/bin:$SPARK_HOME/sbin
+export PYSPARK_PYTHON=/usr/bin/python3
+```
+
+```bash
+source ~/.bashrc
+```
+
+### 1.2 Configure Spark 
+
+```bash
+cd spark
+cd conf
+cp spark-env.sh.template spark-env.sh
+cp spark-defaults.conf.template spark-defaults.conf
+```
+
+### spark-env.sh
+
+#### For Master : 
+
+```bash
+export SPARK_MASTER_HOST=mst01 # For other NNs place their hostname
+export SPARK_MASTER_PORT=7077
+export SPARK_MASTER_WEBUI_PORT=8880
+export SPARK_DAEMON_JAVA_OPTS="-Dspark.deploy.recoveryMode=ZOOKEEPER \
+  -Dspark.deploy.zookeeper.url=zk1:2181,zk2:2181,zk3:2181 \
+  -Dspark.deploy.zookeeper.dir=/spark"
+export HADOOP_CONF_DIR=/opt/hadoop/etc/hadoop
+export SPARK_DIST_CLASSPATH=$(hadoop classpath)
+export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
+```
+
+#### For Workers :
+
+```bash
+export SPARK_DAEMON_JAVA_OPTS="-Dspark.deploy.recoveryMode=ZOOKEEPER \
+  -Dspark.deploy.zookeeper.url=zk1:2181,zk2:2181,zk3:2181 \
+  -Dspark.deploy.zookeeper.dir=/spark"
+export HADOOP_CONF_DIR=/opt/hadoop/etc/hadoop
+export SPARK_DIST_CLASSPATH=$(hadoop classpath)
+export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
+```
+
+
+### spark-defaults.conf
+
+```bash
+
+spark.master                    spark://bigdataproxy:7077
+spark.submit.deployMode         cluster
+spark.sql.catalogImplementation hive
+spark.eventLog.enabled          true
+spark.eventLog.dir              hdfs:///spark-logs
+spark.history.fs.logDirectory   hdfs:///spark-logs
+```
+
+### HDFS Folder for Spark event logging and the history server
+
+
+```bash
+hdfs dfs -mkdir -p /spark-logs
+```
