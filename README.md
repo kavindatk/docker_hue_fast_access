@@ -479,9 +479,11 @@ df.show()
 
 #### PySpark Terminal
 
+
 <picture>
   <img alt="docker" src="https://github.com/kavindatk/presto_spark_hue/blob/main/images/verfy_spark.JPG" width="800" height="400">
 </picture>
+
 
 <br/>
 
@@ -491,14 +493,18 @@ You can test the Spark master failover by shutting down the currently active Spa
 
 If everything is configured correctly, Spark will automatically switch to the next available master node, ensuring high availability.
 
+
 <picture>
   <img alt="docker" src="https://github.com/kavindatk/presto_spark_hue/blob/main/images/spark_worker.JPG" width="800" height="400">
 </picture>
+
 
 <br/>
 
 #### Spark History Server
 
+
 <picture>
   <img alt="docker" src="https://github.com/kavindatk/presto_spark_hue/blob/main/images/spark_history.JPG" width="800" height="400">
 </picture>
+
