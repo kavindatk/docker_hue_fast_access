@@ -156,7 +156,7 @@ Modfied only core-site.xml to HA proxy via HDFS access
 ```xml
       <property>
               <name>fs.defaultFS</name>
-              <value>hdfs://bigdatacluster:8020</value>
+              <value>hdfs://bigdataproxy:8020</value>
       </property>
 ```
 
