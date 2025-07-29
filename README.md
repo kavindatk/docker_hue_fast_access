@@ -249,9 +249,9 @@ The following steps will guide you through the Spark installation process on an 
 ### 1.1 Download Presto and set Environment Variables
 
 ```bash
-wget https://downloads.apache.org/spark/spark-3.5.6/spark-3.5.6-bin-without-hadoop.tgz
-tar -xvzf spark-3.5.6-bin-without-hadoop.tgz
-mv spark-3.5.6-bin-without-hadoop spark
+wget https://dlcdn.apache.org/spark/spark-3.5.6/spark-3.5.6-bin-hadoop3.tgz
+tar -xvzf spark-3.5.6-bin-hadoop3.tgz
+mv spark-3.5.6-bin-hadoop3 spark
 mv spark /opt/
 ```
 
@@ -277,6 +277,7 @@ cd spark
 cd conf
 cp spark-env.sh.template spark-env.sh
 cp spark-defaults.conf.template spark-defaults.conf
+cp log4j2.properties.template log4j2.properties
 ```
 
 ### spark-env.sh
@@ -284,39 +285,124 @@ cp spark-defaults.conf.template spark-defaults.conf
 #### For Master : 
 
 ```bash
-export SPARK_MASTER_HOST=mst01 # For other NNs place their hostname
+# Spark HA Configureations
+
+
+# Java Home
+export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
+
+# Spark Configuration
+export SPARK_MASTER_HOST=mst01 #Replace with master hostname
 export SPARK_MASTER_PORT=7077
 export SPARK_MASTER_WEBUI_PORT=8880
-export SPARK_DAEMON_JAVA_OPTS="-Dspark.deploy.recoveryMode=ZOOKEEPER \
-  -Dspark.deploy.zookeeper.url=zk1:2181,zk2:2181,zk3:2181 \
-  -Dspark.deploy.zookeeper.dir=/spark"
-export HADOOP_CONF_DIR=/opt/hadoop/etc/hadoop
-export SPARK_DIST_CLASSPATH=$(hadoop classpath)
-export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
+
+# Worker Configuration
+export SPARK_WORKER_CORES=4
+export SPARK_WORKER_MEMORY=4g
+export SPARK_WORKER_PORT=7078
+export SPARK_WORKER_WEBUI_PORT=8081
+
+# History Server
+export SPARK_HISTORY_OPTS="-Dspark.history.ui.port=18080 -Dspark.history.fs.logDirectory=hdfs://hadoop-cluster/spark-logs"
+
+# Daemon Memory
+export SPARK_DAEMON_MEMORY=1g
+
+# Hadoop Configuration
+export HADOOP_CONF_DIR=$HADOOP_CONF_DIR
+export YARN_CONF_DIR=/etc/hadoop/etc/hadoop
+
+# Hive Configuration
+export HIVE_CONF_DIR=/etc/hive/conf
+
+# Spark Classpath
+#export SPARK_DIST_CLASSPATH=$(hadoop classpath)
+export SPARK_DIST_CLASSPATH=$(/opt/hadoop/bin/hadoop classpath)
 ```
 
 #### For Workers :
 
 ```bash
-export SPARK_DAEMON_JAVA_OPTS="-Dspark.deploy.recoveryMode=ZOOKEEPER \
-  -Dspark.deploy.zookeeper.url=zk1:2181,zk2:2181,zk3:2181 \
-  -Dspark.deploy.zookeeper.dir=/spark"
-export HADOOP_CONF_DIR=/opt/hadoop/etc/hadoop
-export SPARK_DIST_CLASSPATH=$(hadoop classpath)
+# Spark HA Configureations
+
+
+# Java Home
 export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
+
+# Worker Configuration
+export SPARK_WORKER_CORES=4
+export SPARK_WORKER_MEMORY=4g
+export SPARK_WORKER_PORT=7078
+export SPARK_WORKER_WEBUI_PORT=8081
+
+# History Server
+export SPARK_HISTORY_OPTS="-Dspark.history.ui.port=18080 -Dspark.history.fs.logDirectory=hdfs://hadoop-cluster/spark-logs"
+
+# Daemon Memory
+export SPARK_DAEMON_MEMORY=1g
+
+# Hadoop Configuration
+export HADOOP_CONF_DIR=$HADOOP_CONF_DIR
+export YARN_CONF_DIR=/etc/hadoop/etc/hadoop
+
+# Hive Configuration
+export HIVE_CONF_DIR=/etc/hive/conf
+
+# Spark Classpath
+#export SPARK_DIST_CLASSPATH=$(hadoop classpath)
+export SPARK_DIST_CLASSPATH=$(/opt/hadoop/bin/hadoop classpath)
 ```
 
 
 ### spark-defaults.conf
 
 ```bash
+# Spark Master HA Configuration
+spark.master                    spark://mst01:7077,mst02:7077,mst03:7077
 
-spark.master                    spark://bigdataproxy:7077
-spark.submit.deployMode         cluster
-spark.sql.catalogImplementation hive
+# Zookeeper for HA coordination (using your existing ZK cluster)
+spark.deploy.recoveryMode       ZOOKEEPER
+spark.deploy.zookeeper.url      mst01:2181,mst02:2181,mst03:2181
+spark.deploy.zookeeper.dir      /spark-ha
+
+# History Server Configuration
 spark.eventLog.enabled          true
-spark.eventLog.dir              hdfs:///spark-logs
-spark.history.fs.logDirectory   hdfs:///spark-logs
+spark.eventLog.dir              hdfs://hadoop-cluster/spark-logs
+spark.history.fs.logDirectory   hdfs://hadoop-cluster/spark-logs
+spark.history.ui.port           18080
+
+# Hive Integration
+spark.sql.hive.metastore.uris   thrift://bigdataproxy:9083
+spark.sql.warehouse.dir         hdfs://hadoop-cluster/user/hive/warehouse
+spark.sql.catalogImplementation hive
+
+# Thrift Server Configuration
+spark.sql.hive.thriftServer.singleSession   false
+spark.sql.thrift.server.port                10001
+
+# Resource Configuration
+spark.executor.memory           2g
+spark.executor.cores            2
+spark.driver.memory             1g
+spark.driver.cores              1
+
+# Serialization
+spark.serializer                org.apache.spark.serializer.KryoSerializer
+
+# Dynamic Allocation (Optional)
+spark.dynamicAllocation.enabled             true
+spark.dynamicAllocation.minExecutors        1
+spark.dynamicAllocation.maxExecutors        10
+spark.dynamicAllocation.initialExecutors    2
+
+```
+
+
+### workers
+
+```bash
+slv01
+slv02
 ```
 
 ### HDFS Folder for Spark event logging and the history server
@@ -325,3 +411,94 @@ spark.history.fs.logDirectory   hdfs:///spark-logs
 ```bash
 hdfs dfs -mkdir -p /spark-logs
 ```
+
+<br/>
+
+Once the above modifications are complete, you need to <b>distribute the Spark folder and its configuration files to all master and worker nodes in the cluster</b>.
+This ensures that <b>Spark is properly installed and configured on every node</b>, and all nodes can work together as part of the same Spark cluster.
+
+<br/>
+
+### 1.3 Start Spark Service
+
+On Each Master Node 
+
+```bash
+start-master.sh
+start-history-server.sh
+
+stop-master.sh
+stop-history-server.sh
+```
+
+
+On Each Worker/Slave Node 
+
+```bash
+start-worker.sh  spark://mst01:7077,mst02:7077,mst03:7077
+
+stop-worker.sh  
+```
+
+
+###  Monitor Services and Verify the Cluster
+
+Once all services are started, you can monitor the cluster status using the HAProxy web interface.
+
+The following steps show how to:
+
+* Verify the overall health of the cluster
+* Check Hive connectivity
+* Ensure that all components are running and communicating correctly
+
+Run following command on any server 
+
+```bash
+pyspark \
+  --master spark://mst01:7077,mst02:7077,mst03:7077 \
+  --conf spark.deploy.recoveryMode=ZOOKEEPER \
+  --conf spark.deploy.zookeeper.url=mst01:2181,mst02:2181,mst03:2181 \
+  --conf spark.deploy.zookeeper.dir=/spark-ha
+```
+
+```python
+
+import pyspark
+from pyspark.sql import SparkSession
+from pyspark.sql import functions as f
+from pyspark.sql.types import StringType , ArrayType , IntegerType
+
+spark = SparkSession.builder.master("spark://mst01:7077,mst02:7077,mst03:7077").appName("Test").enableHiveSupport().getOrCreate()
+
+df = spark.read.table("presto_db.presto_web")
+
+df.printSchema()
+
+df.show()
+```
+
+#### PySpark Terminal
+
+<picture>
+  <img alt="docker" src="https://github.com/kavindatk/presto_spark_hue/blob/main/images/verfy_spark.JPG" width="800" height="400">
+</picture>
+
+<br/>
+
+#### Spark Worker Web 
+
+You can test the Spark master failover by shutting down the currently active Spark master node.
+
+If everything is configured correctly, Spark will automatically switch to the next available master node, ensuring high availability.
+
+<picture>
+  <img alt="docker" src="https://github.com/kavindatk/presto_spark_hue/blob/main/images/spark_worker.JPG" width="800" height="400">
+</picture>
+
+<br/>
+
+#### Spark History Server
+
+<picture>
+  <img alt="docker" src="https://github.com/kavindatk/presto_spark_hue/blob/main/images/spark_history.JPG" width="800" height="400">
+</picture>
