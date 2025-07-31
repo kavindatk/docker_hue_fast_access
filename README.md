@@ -1,4 +1,4 @@
-# GUI-Based Querying and Fast Data Retrieval
+# Part 5: GUI-Based Querying and Fast Data Retrieval
 
 <br/><br/>
 <p align="center">
