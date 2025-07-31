@@ -143,7 +143,7 @@ hive.non-managed-table-writes-enabled=true
 hive.non-managed-table-creates-enabled=true
 ```
 
-* hadoop/<hadoop config for presto>
+* hadoop/ #hadoop config for presto
 
 ```bash
 mkdir hadoop
@@ -151,7 +151,7 @@ cd haoop
 <copy hadoop core-site.xml , hdfs-site.xml and yarn-sie.xml and modified for presto , this need if you have HA setup> 
 ```
 
-Modfied only core-site.xml to HA proxy via HDFS access
+Modified only core-site.xml to HA proxy via HDFS access
 
 ```xml
       <property>
