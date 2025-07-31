@@ -550,8 +550,26 @@ FLUSH PRIVILEGES;
 EXIT;
 ```
 
+<br>
 
 <picture>
-  <img alt="docker" src="https://github.com/kavindatk/presto_spark_hue/blob/main/images/hue_db_user.JPGg" width="800" height="400">
+  <img alt="docker" src="https://github.com/kavindatk/presto_spark_hue/blob/main/images/hue_db_user.JPG" width="600" height="400">
 </picture>
+
+<br/>
+
+### 1.2 Configure Hue to Connect with Hive and Presto 
+
+For set up configurations, 'hue.ini' file should be edited
+
+(https://github.com/cloudera/hue/blob/master/desktop/conf.dist/hue.ini) 
+
+```bash
+sudo mkdir /opt/hue/
+sudo mkdir /opt/hue/conf
+cd /opt/hue/conf/
+<download and copy hue.ini to conf path>
+chmod 777 hue.ini
+sudo chown -R hadoop:hadoop /opt/hue/
+```
 
