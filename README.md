@@ -508,3 +508,50 @@ If everything is configured correctly, Spark will automatically switch to the ne
   <img alt="docker" src="https://github.com/kavindatk/presto_spark_hue/blob/main/images/spark_history.JPG" width="800" height="400">
 </picture>
 
+<br/>
+
+# HUE
+
+<picture>
+  <img alt="docker" src="https://github.com/kavindatk/presto_spark_hue/blob/main/images/hue_logo.png" width="200" height="100">
+</picture>
+
+
+## Step 1: Install HUE on Ubuntu
+
+The following steps will guide you through the <b>HUE installation process on an Ubuntu environment</b>.
+
+In this setup, I’m using the <b>official HUE Docker image</b> to install and run HUE.
+
+Since this involves Docker and HAProxy, I’ve written <b> separate articles </b> covering those topics in detail.
+You can refer to them to get a better understanding:
+
+👉 [Docker and HAProxy](https://github.com/kavindatk/haproxy_docker_setup)
+
+<br/>
+
+### 1.1 Download Presto and set Environment Variables
+
+```bash
+docker pull gethue/hue:latest
+```
+
+
+### 1.2 Configure Presto 
+
+Create Hue user and hue database in mariadb , log into any mariadb database (We have already setup the galera cluster)
+
+
+```sql
+CREATE DATABASE hue;
+CREATE USER 'hue'@'%' IDENTIFIED BY 'hue';
+GRANT ALL PRIVILEGES ON hue.* TO 'hue'@'%';
+FLUSH PRIVILEGES;
+EXIT;
+```
+
+
+<picture>
+  <img alt="docker" src="https://github.com/kavindatk/presto_spark_hue/blob/main/images/hue_db_user.JPGg" width="800" height="400">
+</picture>
+
