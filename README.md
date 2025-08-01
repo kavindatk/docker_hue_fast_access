@@ -560,7 +560,7 @@ EXIT;
 
 <br/>
 
-### 1.2 Configure Hue to Connect with Hive and Presto 
+### 1.2 Configure Hue to Connect with Hive, Presto and SparkSQL
 
 For set up configurations, 'hue.ini' file should be edited
 
@@ -574,4 +574,42 @@ cd /opt/hue/conf/
 chmod 777 hue.ini
 sudo chown -R hadoop:hadoop /opt/hue/
 ```
+
+#### Hue Configuration (hue.ini)
+
+The modification of the hue.ini file can be quite lengthy, so I’ve uploaded the full configuration file to the GitHub repository for easy reference.
+
+🔗 Please refer to the file in the repo to see all settings.
+
+<br/>  
+
+👉 [hue.ini](https://github.com/kavindatk/presto_spark_hue/blob/main/hue_config/conf/hue.ini)
+    
+
+Since we are using a 3-NameNode Hadoop setup, make sure to update specific sections of the file with the correct NameNode IP addresses or hostnames, especially in places related to HDFS, YARN, Hive, and Spark integrations.
+
+### 1.3 Start HUE Docker Containner 
+
+```bash
+docker run -d -p 8888:8888   --name hue   -v /opt/hue/conf/hue.ini:/usr/share/hue/desktop/conf/hue.ini   --network host   hue-custom
+```
+
+###  Monitor Services and Verify the Hue
+
+In the web browser , you can access HUE interface by entering following URL
+
+```xml
+http://mst01:8888/hue/editor?editor=67
+http://mst02:8888/hue/editor?editor=67
+http://mst03:8888/hue/editor?editor=67
+
+or if you enabled access via HAProxy
+
+http://bigdataproxy:8888/hue/editor?editor=67 
+```
+
+
+<picture>
+  <img alt="docker" src="https://github.com/kavindatk/presto_spark_hue/blob/main/images/hue_web.png" width="700" height="300">
+</picture>
 
