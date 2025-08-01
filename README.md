@@ -426,9 +426,11 @@ On Each Master Node
 ```bash
 start-master.sh
 start-history-server.sh
+start-thriftserver.sh --hiveconf hive.server2.thrift.port=10001
 
 stop-master.sh
 stop-history-server.sh
+stop-thriftserver.sh
 ```
 
 
